@@ -2,12 +2,67 @@
 
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             BackgroundColor="#F2F2F2"
+             xmlns:iOS="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+             iOS:Page.UseSafeArea="True"
              x:Class="FireXamarin.Views.ContactDataPage">
-    <ContentPage.Content>
-        <StackLayout>
-            <Label Text="Hello, world!"
-                   VerticalOptions="CenterAndExpand"
-                   HorizontalOptions="CenterAndExpand" />
-        </StackLayout>
-    </ContentPage.Content>
+    <ScrollView
+        HorizontalOptions="FillAndExpand"
+        Margin="0,8,0,0"
+        VerticalOptions="Start">
+        <Frame
+            BackgroundColor="#FCFCFC"
+            CornerRadius="20"
+            HasShadow="False">
+
+            <StackLayout
+                VerticalOptions="Start"
+                Padding="0"
+                HorizontalOptions="FillAndExpand"
+                Spacing="16">
+
+                <StackLayout
+                    Spacing="8">
+                    <Label
+                        Text="Nome*"
+                        FontSize="Medium"/>
+                    <Entry
+                        Margin="0,-4,0,0"
+                        Placeholder="Digite o nome para o contato"
+                        Text="{Binding Name}" />
+                </StackLayout>
+
+                <StackLayout
+                    Spacing="8">
+                    <Label
+                        Text="Telefone*"
+                        FontSize="Medium"/>
+                    <Entry
+                        Margin="0,-4,0,0"
+                        Placeholder="Digite o telefone do contato"
+                        Text="{Binding Name}" />
+                </StackLayout>
+                
+                <StackLayout
+                    Spacing="8">
+                    <Label
+                        Text="Email"
+                        FontSize="Medium"/>
+                    <Entry
+                        Margin="0,-4,0,0"
+                        Placeholder="Digite o email do contato"
+                        Text="{Binding Name}" />
+                </StackLayout>
+                
+                <Button
+                    VerticalOptions="Center"
+                    HorizontalOptions="Center"
+                    Text="Remover Contato"
+                    TextColor="Red"
+                    IsVisible="{Binding IsEdit}"
+                    Command="RemoveContactCommand"
+                    />
+            </StackLayout>
+        </Frame>
+    </ScrollView>
 </ContentPage>

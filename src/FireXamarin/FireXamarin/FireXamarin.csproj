@@ -26,6 +26,10 @@
       <SubType>Designer</SubType>
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Controls\FabButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator></Generator>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +38,9 @@
     </Compile>
     <Compile Update="Views\ContactDataPage.xaml.cs">
       <DependentUpon>ContactDataPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Controls\FabButton.xaml.cs">
+      <DependentUpon>FabButton.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>
