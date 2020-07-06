@@ -1,4 +1,5 @@
 ﻿using System;
+using FireXamarin.Views;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -10,7 +11,7 @@ namespace FireXamarin
         {
             InitializeComponent();
 
-            MainPage = new MainPage();
+            MainPage = new ContactListPage();
         }
 
         protected override void OnStart()
