@@ -9,19 +9,18 @@ using FireXamarin.Models;
 
 namespace FireXamarin.Services
 {
-    public interface IFireBaseService
+    public interface IContactFireBaseService
     {
         Task<IEnumerable<Contact>> GetAllContacts();
         Task<Contact> GetById(string id);
-        Task<bool> AddContact(string name, string phone, string email);
-        Task<bool> EditContact(string id, string name, string phone, string email);
+        Task<bool> SaveContact(Contact contact);
         Task<bool> RemoveContact(string id);
     }
 
 
-    public class FirebaseService : IFireBaseService
+    public class ContactFirebaseService : IContactFireBaseService
     {
-        private readonly FirebaseClient _firebase = new FirebaseClient("https://xamarinfirebase-909d2.firebaseio.com/");
+        private readonly FirebaseClient _firebase = new FirebaseClient("https://firexamarin-contacts.firebaseio.com/");
         private const string Table = "Contacts";
 
         public async Task<IEnumerable<Contact>> GetAllContacts()
@@ -40,6 +39,9 @@ namespace FireXamarin.Services
 
         public async Task<Contact> GetById(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return null;
+
             var result = (await _firebase
                     .Child(Table)
                     .OnceAsync<Contact>())
@@ -47,42 +49,32 @@ namespace FireXamarin.Services
 
             return result?.Object;
         }
-
-        public async Task<bool> AddContact(string name, string phone, string email)
+        
+        public async Task<bool> SaveContact(Contact contact)
         {
-            var result = await _firebase
-                .Child(Table)
-                .PostAsync(
-                    new Contact()
-                    {
-                        Id = Generator.GetId(8),
-                        Name = name,
-                        Phone = phone,
-                        Email = email
-                    });
-
-            return result != null;
-        }
-
-        public async Task<bool> EditContact(string id, string name, string phone, string email)
-        {
-            var contactToEdit = (await _firebase
+            if (!contact.ValidatePropertiesRequired())
+                return false;
+            
+            var contactExists = (await _firebase
                     .Child(Table)
                     .OnceAsync<Contact>())
-                .FirstOrDefault(a => a.Object.Id == id);
+                .FirstOrDefault(a => a.Object.Id == contact.Id);
 
             try
             {
+                if (contactExists == null)
+                {
+                    var result = await _firebase
+                        .Child(Table)
+                        .PostAsync(contact);
+
+                    return result != null;
+                }
+                
                 await _firebase
                     .Child(Table)
-                    .Child(contactToEdit?.Key)
-                    .PutAsync(new Contact()
-                    {
-                        Id = id,
-                        Name = name,
-                        Phone = phone,
-                        Email = email
-                    });
+                    .Child(contactExists?.Key)
+                    .PutAsync(contact);
 
                 return true;
             }
@@ -95,6 +87,9 @@ namespace FireXamarin.Services
 
         public async Task<bool> RemoveContact(string id)
         {
+            if (string.IsNullOrWhiteSpace(id))
+                return false;
+            
             var contactToRemove = (await _firebase
                     .Child(Table)
                     .OnceAsync<Contact>())
@@ -109,6 +104,7 @@ namespace FireXamarin.Services
             }
             catch (Exception e)
             {
+                Console.WriteLine(e.Message);
                 return false;
             }
             
