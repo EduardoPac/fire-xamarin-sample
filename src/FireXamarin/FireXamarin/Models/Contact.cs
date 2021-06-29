@@ -3,12 +3,36 @@ namespace FireXamarin.Models
     public class Contact : BaseModel
     {
         public string Id { get; set; }
-        public string Name { get; set; }
-        public string Phone { get; set; }
-        public string Email { get; set; }
-        public string Location { get; set; }
 
-        #region Internal_entitities
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
+        }
+
+        private string _phone;
+        public string Phone
+        {
+            get => _phone;
+            set => SetProperty(ref _phone, value);
+        }
+
+        private string _email;
+        public string Email
+        {
+            get => _email;
+            set => SetProperty(ref _email, value);
+        }
+
+        private string _location;
+        public string Location
+        {
+            get => _location;
+            set => SetProperty(ref _location, value);
+        }
+
+        #region Internal_List
         private bool _isFirst;
         public bool IsFirst
         {
@@ -22,6 +46,8 @@ namespace FireXamarin.Models
             get => _isLast;
             set => SetProperty(ref _isLast, value);
         }
+
+
         #endregion
 
         public bool ValidatePropertiesRequired()

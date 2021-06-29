@@ -16,15 +16,13 @@ namespace FireXamarin.Services
         Task<bool> RemoveContact(string id);
     }
 
-
     public class ContactFirebaseService : IContactFireBaseService
     {
         private readonly FirebaseClient _firebase = new("https://firexamarin-contacts.firebaseio.com/");
         private const string Table = "Contacts";
 
-        public async Task<IEnumerable<Contact>> GetAllContacts()
-        {
-            return (await _firebase
+        public async Task<IEnumerable<Contact>> GetAllContacts() =>
+                (await _firebase
                 .Child(Table)
                 .OnceAsync<Contact>()).Select(item =>
                 new Contact()
@@ -34,7 +32,6 @@ namespace FireXamarin.Services
                     Phone = item.Object.Phone,
                     Email = item.Object.Email
                 });
-        }
 
         public async Task<Contact> GetById(string id)
         {
