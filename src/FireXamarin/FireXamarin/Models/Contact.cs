@@ -6,7 +6,9 @@ namespace FireXamarin.Models
         public string Name { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
+        public string Location { get; set; }
 
+        #region Internal_entitities
         private bool _isFirst;
         public bool IsFirst
         {
@@ -20,7 +22,8 @@ namespace FireXamarin.Models
             get => _isLast;
             set => SetProperty(ref _isLast, value);
         }
-        
+        #endregion
+
         public bool ValidatePropertiesRequired()
         {
             return !string.IsNullOrWhiteSpace(Id) &&

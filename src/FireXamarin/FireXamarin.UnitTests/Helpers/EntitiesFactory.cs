@@ -22,15 +22,17 @@ namespace FireXamarin.UnitTests.Helpers
                 Id = Generator.GetId(8),
                 Name = _faker.Person.FullName,
                 Phone = _faker.Person.Phone,
-                Email = _faker.Person.Email
+                Email = _faker.Person.Email,
+                Location = _faker.Locale
             };
 
-        public Contact GetNewContactParameterized(string id, string name, string phone) =>
+        public Contact GetNewContactParameterized(string id, string name, string phone, string locale) =>
             new Contact
             {
                 Id = id,
                 Name = name,
-                Phone = phone
+                Phone = phone,
+                Location = locale
             };
 
         public List<Contact> GetContactList()

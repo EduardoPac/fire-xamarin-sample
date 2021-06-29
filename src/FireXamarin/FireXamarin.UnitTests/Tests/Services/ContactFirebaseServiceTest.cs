@@ -10,8 +10,8 @@ namespace FireXamarin.UnitTests.Tests.Services
     {
         #region Setup
 
-        private readonly ContactFirebaseService _service = new ContactFirebaseService();
-        private readonly Contact _contactInTest = new Contact {Id = "test", Name = "test", Email = "test", Phone = "test"};
+        private readonly ContactFirebaseService _service = new();
+        private readonly Contact _contactInTest = new() { Id = "test", Name = "test", Email = "test", Phone = "test"};
 
         #endregion
 
@@ -69,12 +69,12 @@ namespace FireXamarin.UnitTests.Tests.Services
         }
 
         [Theory]
-        [InlineData(null, "test", "test")]
-        [InlineData("test", null, "test")]
-        [InlineData("test", "test", null)]
-        public async void SaveContactInvalid(string id, string name, string phone)
+        [InlineData(null, "test", "test", "test")]
+        [InlineData("test", null, "test", "test")]
+        [InlineData("test", "test", null, "test")]
+        public async void SaveContactInvalid(string id, string name, string phone, string location)
         {
-            var contact = EntitiesFactory.GetNewContactParameterized(id, name, phone);
+            var contact = EntitiesFactory.GetNewContactParameterized(id, name, phone, location);
 
             var result = await _service.SaveContact(contact);
 

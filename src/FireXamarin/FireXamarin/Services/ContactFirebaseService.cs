@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BurgerMonkeys.Tools;
 using Firebase.Database;
 using Firebase.Database.Query;
 using FireXamarin.Models;
@@ -20,7 +19,7 @@ namespace FireXamarin.Services
 
     public class ContactFirebaseService : IContactFireBaseService
     {
-        private readonly FirebaseClient _firebase = new FirebaseClient("https://firexamarin-contacts.firebaseio.com/");
+        private readonly FirebaseClient _firebase = new("https://firexamarin-contacts.firebaseio.com/");
         private const string Table = "Contacts";
 
         public async Task<IEnumerable<Contact>> GetAllContacts()
@@ -95,6 +94,9 @@ namespace FireXamarin.Services
                     .OnceAsync<Contact>())
                     .FirstOrDefault(a => a.Object.Id == id);
 
+            if (contactToRemove == null)
+                return false;
+
             try
             {
                 await _firebase.Child(Table)
@@ -107,7 +109,6 @@ namespace FireXamarin.Services
                 Console.WriteLine(e.Message);
                 return false;
             }
-            
         }
     }
 }

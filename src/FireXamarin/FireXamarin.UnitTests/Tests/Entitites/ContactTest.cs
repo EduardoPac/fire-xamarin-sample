@@ -17,12 +17,12 @@ namespace FireXamarin.UnitTests.Tests.Entitites
         }
 
         [Theory]
-        [InlineData(null,"test","test")]
-        [InlineData("test",null,"test")]
-        [InlineData("test","test",null)]
-        public void PropertiesRequiredInvalid(string id, string name, string phone)
+        [InlineData(null,"test","test","test")]
+        [InlineData("test",null,"test","test")]
+        [InlineData("test","test",null,"test")]
+        public void PropertiesRequiredInvalid(string id, string name, string phone, string location)
         {
-            var contact = EntitiesFactory.GetNewContactParameterized(id, name, phone);
+            var contact = EntitiesFactory.GetNewContactParameterized(id, name, phone, location);
             
             bool result = contact.ValidatePropertiesRequired();
             
