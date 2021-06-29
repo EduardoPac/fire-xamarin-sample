@@ -8,15 +8,29 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <LangVersion>9.0</LangVersion>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="BurgerMonkeys.Tools" Version="1.1.4" />
     <PackageReference Include="FirebaseDatabase.net" Version="4.0.6" />
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
+    <PackageReference Include="Xamarin.CommunityToolkit" Version="1.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Fonts\Font Awesome 5 Free-Regular-400.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Fonts\Font Awesome 5 Free-Solid-900.otf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Constants.cs" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Views\ContactListPage.xaml">
       <SubType>Designer</SubType>
@@ -33,6 +47,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Resources\Constants.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Update="Views\ContactListPage.xaml.cs">
       <DependentUpon>ContactListPage.xaml</DependentUpon>
     </Compile>
@@ -45,8 +62,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Converter\" />
+    <None Remove="Xamarin.CommunityToolkit" />
+    <None Remove="Resources\" />
+    <None Remove="Resources\Fonts\" />
+    <None Remove="Resources\Fonts\Font Awesome 5 Free-Regular-400.otf" />
+    <None Remove="Resources\Fonts\Font Awesome 5 Free-Solid-900.otf" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converter\" />
+    <Folder Include="Resources\" />
+    <Folder Include="Resources\Fonts\" />
   </ItemGroup>
 </Project>

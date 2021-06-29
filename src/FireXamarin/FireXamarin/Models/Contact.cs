@@ -1,3 +1,5 @@
+using BurgerMonkeys.Tools;
+
 namespace FireXamarin.Models
 {
     public class Contact : BaseModel
@@ -47,6 +49,9 @@ namespace FireXamarin.Models
             set => SetProperty(ref _isLast, value);
         }
 
+        public bool HasLocation { get => Location.IsNotNullOrWhiteSpace(); }
+
+        public bool HasEmail { get => Email.IsNotNullOrWhiteSpace(); }
 
         #endregion
 
