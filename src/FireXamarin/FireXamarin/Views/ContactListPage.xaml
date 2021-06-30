@@ -7,7 +7,8 @@
     xmlns:controls="clr-namespace:FireXamarin.Controls;assembly=FireXamarin"
     xmlns:converters="clr-namespace:FireXamarin.Converter;assembly=FireXamarin"
     xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
-    Title="Fire Xamarin Contacts"
+    Title="Fire Contacts"
+    ios:NavigationPage.HideNavigationBarSeparator="True"
     ios:Page.UseSafeArea="True"
     BackgroundColor="#F2F2F2">
     <ContentPage.Content>
@@ -29,44 +30,47 @@
                     Text="{Binding SearchText}"
                     TextColor="#000" />
 
-                <CollectionView
-                    Margin="0,8,0,8"
-                    ItemsSource="{Binding Contacts}"
-                    SelectedItem="{Binding Selected, Mode=TwoWay}"
-                    SelectionMode="Single">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <StackLayout
-                                Spacing="0"
-                                VerticalOptions="CenterAndExpand">
-                                <BoxView
-                                    x:Name="BoxViewHeader"
-                                    BackgroundColor="#FCFCFC"
-                                    CornerRadius="20,20,0,0"
-                                    HeightRequest="15"
-                                    IsVisible="{Binding IsFirst}" />
+                <RefreshView
+                    Command="{Binding RefreshCommand}"
+                    IsRefreshing="{Binding IsBusy}"
+                    RefreshColor="#F7C52A">
 
+                    <CollectionView
+                        Margin="0,8,0,8"
+                        ItemsSource="{Binding Contacts}"
+                        SelectedItem="{Binding Selected, Mode=TwoWay}"
+                        SelectionMode="Single">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
                                 <StackLayout
-                                    x:Name="MainLayout"
-                                    BackgroundColor="#FCFCFC"
-                                    Spacing="2">
-
+                                    Spacing="0"
+                                    VerticalOptions="CenterAndExpand">
                                     <BoxView
-                                        HeightRequest="16"
-                                        IsVisible="{Binding IsFirst, Converter={converters:InverseBoolConverter}}" />
-
-                                    <Label
-                                        Margin="16,0,0,0"
-                                        FontAttributes="Bold"
-                                        FontSize="Large"
-                                        Text="{Binding Name}"
-                                        TextColor="#CC000000"
-                                        VerticalOptions="Center" />
+                                        x:Name="BoxViewHeader"
+                                        BackgroundColor="#FCFCFC"
+                                        CornerRadius="20,20,0,0"
+                                        HeightRequest="15"
+                                        IsVisible="{Binding IsFirst}" />
 
                                     <StackLayout
-                                        Margin="16,0,0,0"
-                                        Orientation="Horizontal">
+                                        x:Name="MainLayout"
+                                        BackgroundColor="#FCFCFC"
+                                        Spacing="2">
+
+                                        <BoxView
+                                            HeightRequest="16"
+                                            IsVisible="{Binding IsFirst, Converter={converters:InverseBoolConverter}}" />
+
                                         <Label
+                                            Margin="16,0,0,0"
+                                            FontAttributes="Bold"
+                                            FontSize="Large"
+                                            Text="{Binding Name}"
+                                            TextColor="#CC000000"
+                                            VerticalOptions="Center" />
+
+                                        <!--
+                                    <Label
                                             FontFamily="FontAwesomeBold"
                                             FontSize="Medium"
                                             HorizontalTextAlignment="Center"
@@ -75,81 +79,112 @@
                                             TextColor="#80000000"
                                             VerticalOptions="Center"
                                             VerticalTextAlignment="Center" />
+                                        -->
 
-                                        <Label
-                                            FontFamily="FontAwesomeBold"
-                                            FontSize="Medium"
-                                            HorizontalTextAlignment="Center"
-                                            IsVisible="{Binding HasEmail}"
-                                            Text="&#xf0e0;"
-                                            TextColor="#80000000"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center" />
+                                        <StackLayout
+                                            Margin="16,0,0,0"
+                                            HorizontalOptions="FillAndExpand"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
 
-                                        <Label
-                                            FontFamily="FontAwesomeBold"
-                                            FontSize="Medium"
-                                            HorizontalTextAlignment="Center"
-                                            Text="&#xf879;"
-                                            TextColor="#80000000"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center" />
+                                            <Label
+                                                FontFamily="FontAwesomeBold"
+                                                FontSize="Medium"
+                                                HorizontalTextAlignment="Center"
+                                                Text="&#xf879;"
+                                                TextColor="#80000000"
+                                                VerticalOptions="Center"
+                                                VerticalTextAlignment="Center" />
 
-                                        <Label
-                                            FontAttributes="Bold"
-                                            FontSize="Medium"
-                                            HorizontalTextAlignment="Center"
-                                            Text="{Binding Phone}"
-                                            TextColor="#80000000"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center" />
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="Medium"
+                                                HorizontalTextAlignment="Center"
+                                                Text="{Binding Phone}"
+                                                TextColor="#80000000"
+                                                VerticalOptions="Center"
+                                                VerticalTextAlignment="Center" />
+                                        </StackLayout>
+
+                                        <StackLayout
+                                            Margin="16,0,0,0"
+                                            Orientation="Horizontal"
+                                            Spacing="8">
+                                            <Label
+                                                FontFamily="FontAwesomeBold"
+                                                FontSize="Medium"
+                                                HorizontalTextAlignment="Center"
+                                                IsVisible="{Binding HasEmail}"
+                                                Text="&#xf0e0;"
+                                                TextColor="#80000000"
+                                                VerticalOptions="Center"
+                                                VerticalTextAlignment="Center" />
+
+                                            <Label
+                                                FontAttributes="Bold"
+                                                FontSize="Medium"
+                                                HorizontalTextAlignment="Center"
+                                                Text="{Binding Email}"
+                                                TextColor="#80000000"
+                                                VerticalOptions="Center"
+                                                VerticalTextAlignment="Center" />
+                                        </StackLayout>
+
+
+                                        <BoxView
+                                            HeightRequest="16"
+                                            IsVisible="{Binding IsLast, Converter={converters:InverseBoolConverter}}" />
                                     </StackLayout>
 
                                     <BoxView
-                                        HeightRequest="16"
+                                        BackgroundColor="#C5C5C5"
+                                        HeightRequest="1"
+                                        HorizontalOptions="FillAndExpand"
                                         IsVisible="{Binding IsLast, Converter={converters:InverseBoolConverter}}" />
+
+                                    <BoxView
+                                        x:Name="BoxViewFooter"
+                                        BackgroundColor="#FCFCFC"
+                                        CornerRadius="0, 0, 20, 20"
+                                        HeightRequest="15"
+                                        IsVisible="{Binding IsLast}" />
                                 </StackLayout>
-
-                                <BoxView
-                                    BackgroundColor="#C5C5C5"
-                                    HeightRequest="1"
-                                    HorizontalOptions="FillAndExpand"
-                                    IsVisible="{Binding IsLast, Converter={converters:InverseBoolConverter}}" />
-
-                                <BoxView
-                                    x:Name="BoxViewFooter"
-                                    BackgroundColor="#FCFCFC"
-                                    CornerRadius="0, 0, 20, 20"
-                                    HeightRequest="15"
-                                    IsVisible="{Binding IsLast}" />
-                            </StackLayout>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                    <CollectionView.EmptyView>
-                        <StackLayout>
-                            <Label
-                                FontFamily="FontAwesomeBold"
-                                FontSize="Large"
-                                HorizontalTextAlignment="Center"
-                                Text="&#xf2b9;"
-                                TextColor="#80000000"
-                                VerticalOptions="Center"
-                                VerticalTextAlignment="Center" />
-                            <Label
-                                HorizontalOptions="CenterAndExpand"
-                                Text="{Binding EmptyMessage}"
-                                TextColor="#80000000"
-                                VerticalOptions="CenterAndExpand" />
-                        </StackLayout>
-                    </CollectionView.EmptyView>
-                </CollectionView>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <Grid
+                                Padding="16"
+                                HorizontalOptions="FillAndExpand"
+                                VerticalOptions="Center">
+                                <StackLayout
+                                    Spacing="16"
+                                    VerticalOptions="Center">
+                                    <Label
+                                        FontFamily="FontAwesomeBold"
+                                        FontSize="120"
+                                        HorizontalTextAlignment="Center"
+                                        Text="&#xf2b9;"
+                                        TextColor="#80000000"
+                                        VerticalOptions="End"
+                                        VerticalTextAlignment="Center" />
+                                    <Label
+                                        Grid.Row="1"
+                                        HorizontalOptions="CenterAndExpand"
+                                        Text="{Binding EmptyMessage}"
+                                        TextColor="#80000000"
+                                        VerticalOptions="CenterAndExpand" />
+                                </StackLayout>
+                            </Grid>
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </RefreshView>
             </StackLayout>
 
             <controls:FabButton
                 Grid.Row="1"
                 Margin="0,0,0,20"
                 Padding="10"
-                BackgroundColor="#002b75"
+                BackgroundColor="#F7C52A"
                 CornerRadius="29"
                 HeightRequest="48"
                 HorizontalOptions="Center"
@@ -176,7 +211,7 @@
                     <Label
                         HorizontalOptions="CenterAndExpand"
                         Text="Adicionar"
-                        TextColor="White"
+                        TextColor="Black"
                         VerticalOptions="Center" />
                 </StackLayout>
             </controls:FabButton>

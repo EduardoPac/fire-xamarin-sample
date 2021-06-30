@@ -4,7 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using BurgerMonkeys.Tools;
+using FireXamarin.Services;
+using FireXamarin.Views;
 using Xamarin.CommunityToolkit.ObjectModel;
+using Xamarin.Essentials;
+using Xamarin.Forms;
 using Contact = FireXamarin.Models.Contact;
 
 namespace FireXamarin.ViewModels
@@ -13,6 +17,9 @@ namespace FireXamarin.ViewModels
     {
         public List<Contact> AllContacts { get; set; }
         public ObservableRangeCollection<Contact> Contacts { get; set; }
+        private readonly IContactFireBaseService _contactFirebaseService;
+
+        private bool isFirstAccess = true;
 
         Contact _selected;
         public Contact Selected
@@ -41,6 +48,8 @@ namespace FireXamarin.ViewModels
         }
 
         public ICommand AddContactCommand { get; set; }
+        public ICommand RefreshCommand { get; set; }
+        public ICommand ItemTappedCommand { get; set; }
 
         public ContactListViewModel()
         {
@@ -48,6 +57,66 @@ namespace FireXamarin.ViewModels
             AllContacts = new List<Contact>();
             Contacts = new ObservableRangeCollection<Contact>();
             AddContactCommand = new AsyncCommand(AddContactExecute);
+            RefreshCommand = new AsyncCommand(RefreshCommandExecute);
+            ItemTappedCommand = new AsyncCommand(ExecuteItemTappedCommand);
+            _contactFirebaseService = new ContactFirebaseService();
+        }
+
+        public async Task InitializeAsync()
+        {
+            await LoadContacts();
+        }
+
+        #region LoadList
+        private async Task RefreshCommandExecute()
+        {
+            if (!isFirstAccess && !IsBusy)
+                await LoadContacts();
+        }
+
+        private async Task LoadContacts()
+        {
+            IsBusy = true;
+
+            if (Connectivity.NetworkAccess != NetworkAccess.Internet)
+            {
+                EmptyMessage = "Sem Internet :(";
+                isFirstAccess = false;
+            }
+          
+
+            if (AllContacts.Any())
+            {
+                await Task.Delay(10);
+
+                AllContacts.Clear();
+            }
+
+            AllContacts = (await _contactFirebaseService.GetAllContacts()).ToList();
+
+            if (AllContacts.Any())
+                SearchExecute("");
+            else
+            {
+                EmptyMessage = "Não foi encontrado nenhum contato";
+
+                await Task.Delay(10);
+
+                Contacts.Clear();
+
+                isFirstAccess = false;
+                IsBusy = false;
+            }
+        }
+
+        private List<Contact> SortContacts(List<Contact> contacts)
+        {
+            contacts.ForEach(c => { c.IsFirst = false; c.IsLast = false; });
+            contacts.OrderBy(c => c.Name);
+            contacts.First().IsFirst = true;
+            contacts.Last().IsLast = true;
+
+            return contacts;
         }
 
         async void SearchExecute(string search)
@@ -84,80 +153,140 @@ namespace FireXamarin.ViewModels
                     await Task.Delay(50);
                     Contacts.AddRange(data);
                 }
+
+                IsBusy = false;
+                isFirstAccess = false;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                isFirstAccess = false;
+                IsBusy = false;
             }
         }
+        #endregion
 
-        public async Task InitializeAsync()
+        private async Task AddContactExecute() => await Application.Current.MainPage.Navigation.PushAsync(new ContactDataPage());
+
+        #region Options
+        async Task ExecuteItemTappedCommand()
         {
-            await LoadContacts();
-        }
+            if (Selected == null)
+                return;
 
-        private async Task LoadContacts()
-        {
-            if (AllContacts.Any())
-            {
-                await Task.Delay(10);
+            if (Device.RuntimePlatform == Device.iOS)
+                await ShowActionSheet(Selected);
 
-                AllContacts.Clear();
-            }
-
-            AllContacts = new List<Contact>
-            {
-                new Contact()
-                {
-                    Name = "Contato 1",
-                    Phone = "(43) 99165-5865"
-                },
-                new Contact()
-                {
-                    Name = "Contato 1",
-                    Phone = "(43) 99165-5865",
-                    Email = "eduardolll"
-                },
-                new Contact()
-                {
-                    Name = "Contato 1",
-                    Phone = "(43) 99165-5865",
-                    Location = "dfdfdfdf"
-                },
-                new Contact()
-                {
-                    Name = "Contato 1",
-                    Phone = "(43) 99165-5865",
-                    Email = "eduardolll",
-                    Location = "dfdfdfdf"
-                }
-            };
-
-            if (AllContacts.Any())
-                SearchExecute("");
             else
+                await ShowBottomSheet(Selected);
+        }
+
+        private async Task ShowBottomSheet(Contact selected)
+        {
+            /*
+            var items = GetBottomSheetItems(selected);
+
+            await _navigationService.NavigateAsync(nameof(BottomSheetView), new NavigationParameters
             {
-                EmptyMessage = "Não foi encontrado nenhum contato";
+                {Constants.BottomSheetTitle, selected.CodeWithName},
+                {Constants.BottomSheetOptions, items},
+                {Constants.BottomSheetContactSelected, Selected }
+            });
+            */
+            Selected = null;
+        }
 
-                await Task.Delay(10);
+        private async Task ShowActionSheet(Contact selected)
+        {
+            /*
+            var actions = GetActionSheetOptions(selected);
+            if (actions == null || !actions.Any())
+                return;
+            
+            var actionSelected = await _dialogService.DisplayActionSheetAsync(
+                                                      selected.CodeWithName,
+                                                      AppResources.ActionClose,
+                                                      null,
+                                                      actions);
 
-                Contacts.Clear();
+            await ExecuteOption(actionSelected, selected);
+            */
+            Selected = null;
+        }
+
+        /*
+        List<BottomSheetItem> GetBottomSheetItems(Contact selected)
+        {
+            var items = new List<BottomSheetItem>{
+                     new BottomSheetItem { Name = AppResources.ActionChangeStatus, Icon = "f101".ToUnicode() },
+                     new BottomSheetItem { Name = AppResources.ActionAttachments, Icon = "f0c6".ToUnicode()},
+                };
+
+            if (selected.IsResponsible)
+            {
+                items.Insert(0, new BottomSheetItem { Name = AppResources.ActionEdit, Icon = "f044".ToUnicode() });
+                items.Add(new BottomSheetItem { Name = AppResources.ActionRemove, Icon = "f2ed".ToUnicode() });
             }
+
+            else if (selected.IsChecker)
+            {
+                items.Insert(0, new BottomSheetItem { Name = AppResources.ActionView, Icon = "f06e".ToUnicode() });
+            }
+
+            return items;
+
         }
 
-        private List<Contact> SortContacts(List<Contact> contacts)
+        string[] GetActionSheetOptions(Contact selected)
         {
-            contacts.ForEach(c => { c.IsFirst = false; c.IsLast = false; });
-            contacts.OrderBy(c => c.Name);
-            contacts.First().IsFirst = true;
-            contacts.Last().IsLast = true;
+            var items = new List<string>{
+                     AppResources.ActionChangeStatus,
+                     AppResources.ActionAttachments
+                };
 
-            return contacts;
+            if (selected.IsResponsible)
+            {
+                items.Insert(0, AppResources.ActionEdit);
+                items.Add(AppResources.ActionRemove);
+            }
+
+            else if (selected.IsChecker)
+            {
+                items.Insert(0, AppResources.ActionView);
+            }
+
+            return items.ToArray();
+
         }
 
-        private Task AddContactExecute()
+        private async Task ExecuteOption(string actionSelected, Contact selected)
         {
-            throw new NotImplementedException();
+            if (actionSelected == AppResources.ActionView)
+            {
+                await ViewAction(selected);
+            }
+            else if (actionSelected == AppResources.ActionRemove)
+            {
+                await RemovePlan(selected);
+            }
+            else if (actionSelected == AppResources.ActionEdit)
+            {
+                await EditAction(selected);
+            }
+
+            else if (actionSelected == AppResources.ActionAttachments)
+            {
+                await ShowAttachments(selected);
+            }
+
+            else if (actionSelected == AppResources.ActionChangeStatus)
+            {
+                await ChangeStatusTapped(selected);
+            }
+
+            Selected = null;
         }
+        */
+        #endregion
     }
 }

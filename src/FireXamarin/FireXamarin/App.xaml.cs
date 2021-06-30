@@ -11,7 +11,7 @@ namespace FireXamarin
         {
             InitializeComponent();
 
-            MainPage = new ContactListPage();
+            MainPage = new NavigationPage(new ContactListPage()) { BarBackgroundColor = Color.FromHex("#F2F2F2") };
         }
 
         protected override void OnStart()

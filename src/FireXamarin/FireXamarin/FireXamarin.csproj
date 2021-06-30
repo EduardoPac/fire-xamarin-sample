@@ -29,7 +29,6 @@
     <EmbeddedResource Include="Resources\Fonts\Font Awesome 5 Free-Solid-900.otf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Constants.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Update="Views\ContactListPage.xaml">
@@ -47,9 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Resources\Constants.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Update="Views\ContactListPage.xaml.cs">
       <DependentUpon>ContactListPage.xaml</DependentUpon>
     </Compile>
@@ -63,10 +59,6 @@
   <ItemGroup>
     <None Remove="Converter\" />
     <None Remove="Xamarin.CommunityToolkit" />
-    <None Remove="Resources\" />
-    <None Remove="Resources\Fonts\" />
-    <None Remove="Resources\Fonts\Font Awesome 5 Free-Regular-400.otf" />
-    <None Remove="Resources\Fonts\Font Awesome 5 Free-Solid-900.otf" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converter\" />

@@ -1,7 +1,6 @@
-﻿using System;
-namespace FireXamarin.Resources
+﻿namespace FireXamarin.Resources
 {
-    public static class Constants
+    public class Constant
     {
         #region Fonts
 
