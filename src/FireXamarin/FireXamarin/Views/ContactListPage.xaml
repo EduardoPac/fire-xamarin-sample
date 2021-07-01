@@ -39,6 +39,7 @@
                         Margin="0,8,0,8"
                         ItemsSource="{Binding Contacts}"
                         SelectedItem="{Binding Selected, Mode=TwoWay}"
+                        SelectionChangedCommand="{Binding SelectionChangedCommand}"
                         SelectionMode="Single">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
@@ -68,18 +69,6 @@
                                             Text="{Binding Name}"
                                             TextColor="#CC000000"
                                             VerticalOptions="Center" />
-
-                                        <!--
-                                    <Label
-                                            FontFamily="FontAwesomeBold"
-                                            FontSize="Medium"
-                                            HorizontalTextAlignment="Center"
-                                            IsVisible="{Binding HasLocation}"
-                                            Text="&#xf3c5;"
-                                            TextColor="#80000000"
-                                            VerticalOptions="Center"
-                                            VerticalTextAlignment="Center" />
-                                        -->
 
                                         <StackLayout
                                             Margin="16,0,0,0"
@@ -148,6 +137,20 @@
                                         CornerRadius="0, 0, 20, 20"
                                         HeightRequest="15"
                                         IsVisible="{Binding IsLast}" />
+
+                                    <VisualStateManager.VisualStateGroups>
+                                        <VisualStateGroup x:Name="CommonStates">
+                                            <VisualState x:Name="Normal" />
+                                            <VisualState x:Name="Selected">
+                                                <VisualState.Setters>
+                                                    <Setter Property="BackgroundColor" Value="#F2F2F2" />
+                                                    <Setter TargetName="BoxViewHeader" Property="BoxView.BackgroundColor" Value="#80F7C52A" />
+                                                    <Setter TargetName="BoxViewFooter" Property="BoxView.BackgroundColor" Value="#80F7C52A" />
+                                                    <Setter TargetName="MainLayout" Property="BoxView.BackgroundColor" Value="#80F7C52A" />
+                                                </VisualState.Setters>
+                                            </VisualState>
+                                        </VisualStateGroup>
+                                    </VisualStateManager.VisualStateGroups>
                                 </StackLayout>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>

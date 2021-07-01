@@ -6,6 +6,7 @@ using System.Windows.Input;
 using BurgerMonkeys.Tools;
 using FireXamarin.Services;
 using FireXamarin.Views;
+using Rg.Plugins.Popup.Extensions;
 using Xamarin.CommunityToolkit.ObjectModel;
 using Xamarin.Essentials;
 using Xamarin.Forms;
@@ -49,7 +50,7 @@ namespace FireXamarin.ViewModels
 
         public ICommand AddContactCommand { get; set; }
         public ICommand RefreshCommand { get; set; }
-        public ICommand ItemTappedCommand { get; set; }
+        public ICommand SelectionChangedCommand { get; set; }
 
         public ContactListViewModel()
         {
@@ -58,7 +59,7 @@ namespace FireXamarin.ViewModels
             Contacts = new ObservableRangeCollection<Contact>();
             AddContactCommand = new AsyncCommand(AddContactExecute);
             RefreshCommand = new AsyncCommand(RefreshCommandExecute);
-            ItemTappedCommand = new AsyncCommand(ExecuteItemTappedCommand);
+            SelectionChangedCommand = new AsyncCommand(ExecuteSelectionChangedCommand);
             _contactFirebaseService = new ContactFirebaseService();
         }
 
@@ -92,7 +93,9 @@ namespace FireXamarin.ViewModels
                 AllContacts.Clear();
             }
 
-            AllContacts = (await _contactFirebaseService.GetAllContacts()).ToList();
+            var contacts = (await _contactFirebaseService.GetAllContacts()).ToList();
+            //AllContacts = contacts.Where(c => !c.Removed).ToList();
+            AllContacts = contacts;
 
             if (AllContacts.Any())
                 SearchExecute("");
@@ -132,7 +135,7 @@ namespace FireXamarin.ViewModels
                        (i.Name != null && (!string.IsNullOrWhiteSpace(i.Name) && i.Name.IgnoreCaseSensitiveAndAccents().Contains(search)))
                     || (i.Phone != null && (!string.IsNullOrWhiteSpace(i.Phone) && i.Phone.IgnoreCaseSensitiveAndAccents().Contains(search)))
                     || (i.Email != null && (!string.IsNullOrWhiteSpace(i.Email) && i.Email.IgnoreCaseSensitiveAndAccents().Contains(search)))
-                    || (i.Location != null && (!string.IsNullOrWhiteSpace(i.Location) && i.Name.IgnoreCaseSensitiveAndAccents().Contains(search)))
+                    || (i.LocationName != null && (!string.IsNullOrWhiteSpace(i.LocationName) && i.Name.IgnoreCaseSensitiveAndAccents().Contains(search)))
                 ).ToList();
 
                 var data = SortContacts(searchResult);
@@ -166,127 +169,170 @@ namespace FireXamarin.ViewModels
         }
         #endregion
 
-        private async Task AddContactExecute() => await Application.Current.MainPage.Navigation.PushAsync(new ContactDataPage());
+        private async Task AddContactExecute() =>
+            await Application.Current.MainPage.Navigation.PushAsync(new ContactDataPage());
 
         #region Options
-        async Task ExecuteItemTappedCommand()
+
+        const string action_edit = "Editar";
+        const string action_call = "Fazer ligação";
+        const string action_mail = "Enviar email";
+        const string action_route = "Traçar rota";
+        const string action_remove = "Remover";
+        BottomSheetView _bottomSheet;
+
+        async Task ExecuteSelectionChangedCommand()
         {
             if (Selected == null)
                 return;
 
-            if (Device.RuntimePlatform == Device.iOS)
-                await ShowActionSheet(Selected);
+            var title = Selected.Name;
+            if (Device.RuntimePlatform == Device.Android)
+            {
+                var items = new List<BottomSheetItem>
+                {
+                    new BottomSheetItem {Icon = "&#xf304;", Name = action_edit},
+                    new BottomSheetItem {Icon = "&#xf879;", Name = action_call}
+                };
 
+                if (Selected.HasEmail)
+                    items.Add(new BottomSheetItem { Icon = "&#xf0e0;", Name = action_mail });
+                if (Selected.HasLocation)
+                    items.Add(new BottomSheetItem { Icon = "&#xf3c5;", Name = action_route });
+
+                items.Add(new BottomSheetItem { Icon = "&#xf2ed;", Name = action_remove });
+
+                await ShowOptionsBottomSheet(items, title);
+            }
             else
-                await ShowBottomSheet(Selected);
-        }
-
-        private async Task ShowBottomSheet(Contact selected)
-        {
-            /*
-            var items = GetBottomSheetItems(selected);
-
-            await _navigationService.NavigateAsync(nameof(BottomSheetView), new NavigationParameters
             {
-                {Constants.BottomSheetTitle, selected.CodeWithName},
-                {Constants.BottomSheetOptions, items},
-                {Constants.BottomSheetContactSelected, Selected }
-            });
-            */
-            Selected = null;
+                var items = new List<string>
+                {
+                    action_edit,
+                    action_call
+                };
+
+                if (Selected.HasEmail)
+                    items.Add(action_mail);
+                if (Selected.HasLocation)
+                    items.Add(action_route);
+
+                items.Add(action_remove);
+
+                await ShowOptionsActionSheet(
+                    items?.ToArray(),
+                    title);
+            }
         }
 
-        private async Task ShowActionSheet(Contact selected)
+        async Task ShowOptionsActionSheet(string[] options, string title)
         {
-            /*
-            var actions = GetActionSheetOptions(selected);
-            if (actions == null || !actions.Any())
+            var optionSelected = await Application.Current.MainPage
+                .DisplayActionSheet(
+                    title,
+                    "Cancelar",
+                    null,
+                    options);
+            ExecuteAction(optionSelected);
+        }
+
+        async Task ShowOptionsBottomSheet(List<BottomSheetItem> items, string title)
+        {
+            _bottomSheet = new BottomSheetView(title, items);
+            _bottomSheet.SeletectItem += BottomSheetSelectedItem;
+            await Application.Current.MainPage.Navigation.PushPopupAsync(_bottomSheet);
+        }
+
+        void BottomSheetSelectedItem(object sender, ItemTappedEventArgs e)
+        {
+            if (_bottomSheet != null)
+                _bottomSheet.SeletectItem -= BottomSheetSelectedItem;
+
+            if (e.Item == null)
                 return;
-            
-            var actionSelected = await _dialogService.DisplayActionSheetAsync(
-                                                      selected.CodeWithName,
-                                                      AppResources.ActionClose,
-                                                      null,
-                                                      actions);
 
-            await ExecuteOption(actionSelected, selected);
-            */
+            ExecuteAction((e.Item as BottomSheetItem)?.Name);
+        }
+
+        private async void ExecuteAction(string action)
+        {
+            if (action == action_edit)
+                await EditContact(Selected);
+            else if (action == action_call)
+                await CallToContact(Selected.Phone);
+            else if (action == action_mail)
+                await MailToContact(Selected.Email);
+            else if (action == action_route)
+                await RouteToContact(Selected);
+            else if (action == action_remove)
+                await RemoveContact(Selected);
+
             Selected = null;
         }
 
-        /*
-        List<BottomSheetItem> GetBottomSheetItems(Contact selected)
+        private async Task RemoveContact(Contact selected)
         {
-            var items = new List<BottomSheetItem>{
-                     new BottomSheetItem { Name = AppResources.ActionChangeStatus, Icon = "f101".ToUnicode() },
-                     new BottomSheetItem { Name = AppResources.ActionAttachments, Icon = "f0c6".ToUnicode()},
-                };
-
-            if (selected.IsResponsible)
+            if (Connectivity.NetworkAccess != NetworkAccess.Internet)
             {
-                items.Insert(0, new BottomSheetItem { Name = AppResources.ActionEdit, Icon = "f044".ToUnicode() });
-                items.Add(new BottomSheetItem { Name = AppResources.ActionRemove, Icon = "f2ed".ToUnicode() });
+                await Application.Current.MainPage.DisplayAlert(selected.Name, "Sem internet para remover o contato", "OK");
+                return;
             }
 
-            else if (selected.IsChecker)
-            {
-                items.Insert(0, new BottomSheetItem { Name = AppResources.ActionView, Icon = "f06e".ToUnicode() });
-            }
+            var result = await Application.Current.MainPage.DisplayAlert(selected.Name, "Remover o contato?",
+                        "Sim", "Não");
 
-            return items;
+            if (!result)
+                return;
+
+            await _contactFirebaseService.RemoveContact(Selected.Id);
+
+            await LoadContacts();
+        }
+
+        private async Task RouteToContact(Contact selected)
+        {
+            try
+            {
+                await Map.OpenAsync(
+                    new Location(selected.LocationLatitude, selected.LocationLongitude),
+                    new MapLaunchOptions { Name = Selected.LocationName });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await Application.Current.MainPage.DisplayAlert(selected.Name, "O endereço não é valido", "OK");
+            }
 
         }
 
-        string[] GetActionSheetOptions(Contact selected)
+        private async Task MailToContact(string email)
         {
-            var items = new List<string>{
-                     AppResources.ActionChangeStatus,
-                     AppResources.ActionAttachments
-                };
-
-            if (selected.IsResponsible)
+            try
             {
-                items.Insert(0, AppResources.ActionEdit);
-                items.Add(AppResources.ActionRemove);
+                await Email.ComposeAsync("Fire Contacts", "É um email enviado pelo app", new string[] { email });
             }
-
-            else if (selected.IsChecker)
+            catch (Exception ex)
             {
-                items.Insert(0, AppResources.ActionView);
+                Console.WriteLine(ex.Message);
+                await Application.Current.MainPage.DisplayAlert(email, "O email não é valido", "OK");
             }
-
-            return items.ToArray();
-
         }
 
-        private async Task ExecuteOption(string actionSelected, Contact selected)
+        private async Task CallToContact(string phone)
         {
-            if (actionSelected == AppResources.ActionView)
+            try
             {
-                await ViewAction(selected);
+                PhoneDialer.Open(phone);
             }
-            else if (actionSelected == AppResources.ActionRemove)
+            catch (Exception ex)
             {
-                await RemovePlan(selected);
+                Console.WriteLine(ex.Message);
+                await Application.Current.MainPage.DisplayAlert(phone, "O telefone não é valido", "OK");
             }
-            else if (actionSelected == AppResources.ActionEdit)
-            {
-                await EditAction(selected);
-            }
-
-            else if (actionSelected == AppResources.ActionAttachments)
-            {
-                await ShowAttachments(selected);
-            }
-
-            else if (actionSelected == AppResources.ActionChangeStatus)
-            {
-                await ChangeStatusTapped(selected);
-            }
-
-            Selected = null;
         }
-        */
+
+        private async Task EditContact(Contact selected) =>
+            await Application.Current.MainPage.Navigation.PushAsync(new ContactDataPage(selected));
         #endregion
     }
 }

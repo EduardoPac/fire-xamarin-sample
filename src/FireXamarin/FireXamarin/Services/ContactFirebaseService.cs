@@ -30,7 +30,11 @@ namespace FireXamarin.Services
                     Id = item.Object.Id,
                     Name = item.Object.Name,
                     Phone = item.Object.Phone,
-                    Email = item.Object.Email
+                    Email = item.Object.Email,
+                    LocationName = item.Object.LocationName,
+                    LocationLatitude = item.Object.LocationLatitude,
+                    LocationLongitude = item.Object.LocationLongitude,
+                    Removed = item.Object.Removed
                 });
 
         public async Task<Contact> GetById(string id)

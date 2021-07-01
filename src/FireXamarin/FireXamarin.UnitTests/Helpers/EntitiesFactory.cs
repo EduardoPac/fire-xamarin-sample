@@ -23,7 +23,10 @@ namespace FireXamarin.UnitTests.Helpers
                 Name = _faker.Person.FullName,
                 Phone = _faker.Person.Phone,
                 Email = _faker.Person.Email,
-                Location = _faker.Locale
+                LocationName = _faker.Address.FullAddress(),
+                LocationLatitude = _faker.Address.Latitude(),
+                LocationLongitude = _faker.Address.Longitude(),
+                Removed = true
             };
 
         public Contact GetNewContactParameterized(string id, string name, string phone, string locale) =>
@@ -32,7 +35,10 @@ namespace FireXamarin.UnitTests.Helpers
                 Id = id,
                 Name = name,
                 Phone = phone,
-                Location = locale
+                LocationName = locale,
+                LocationLatitude = _faker.Address.Latitude(),
+                LocationLongitude = _faker.Address.Longitude(),
+                Removed = true
             };
 
         public List<Contact> GetContactList()

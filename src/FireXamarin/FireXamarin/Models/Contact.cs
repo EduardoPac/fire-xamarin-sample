@@ -27,11 +27,25 @@ namespace FireXamarin.Models
             set => SetProperty(ref _email, value);
         }
 
-        private string _location;
-        public string Location
+        private string _locationName;
+        public string LocationName
         {
-            get => _location;
-            set => SetProperty(ref _location, value);
+            get => _locationName;
+            set => SetProperty(ref _locationName, value);
+        }
+
+        private double _locationLatitude;
+        public double LocationLatitude
+        {
+            get => _locationLatitude;
+            set => SetProperty(ref _locationLatitude, value);
+        }
+
+        private double _locationLongitude;
+        public double LocationLongitude
+        {
+            get => _locationLongitude;
+            set => SetProperty(ref _locationLongitude, value);
         }
 
         #region Internal_List
@@ -49,7 +63,9 @@ namespace FireXamarin.Models
             set => SetProperty(ref _isLast, value);
         }
 
-        public bool HasLocation { get => Location.IsNotNullOrWhiteSpace(); }
+        public bool Removed { get; set; }
+
+        public bool HasLocation { get => LocationLatitude != 0; }
 
         public bool HasEmail { get => Email.IsNotNullOrWhiteSpace(); }
 

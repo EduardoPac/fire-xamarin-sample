@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using FireXamarin.Models;
 using FireXamarin.ViewModels;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -8,10 +9,10 @@ namespace FireXamarin.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class ContactDataPage : ContentPage
     {
-        public ContactDataPage()
+        public ContactDataPage(Contact selected = null)
         {
             InitializeComponent();
-            BindingContext = new ContactDataViewModel(); 
+            BindingContext = new ContactDataViewModel(selected); 
         }
         
         protected override async void OnAppearing()

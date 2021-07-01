@@ -20,6 +20,8 @@
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
     <PackageReference Include="Xamarin.CommunityToolkit" Version="1.1.0" />
+    <PackageReference Include="Rg.Plugins.Popup" Version="2.0.0.12" />
+    <PackageReference Include="Xamarin.Forms.BehaviorValidationPack" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,6 +61,9 @@
   <ItemGroup>
     <None Remove="Converter\" />
     <None Remove="Xamarin.CommunityToolkit" />
+    <None Remove="Rg.Plugins.Popup" />
+    <None Remove="BurgerMonkeys.UI" />
+    <None Remove="Xamarin.Forms.BehaviorValidationPack" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Converter\" />
