@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using BurgerMonkeys.Tools;
+using FireXamarin.Resources;
 using FireXamarin.Services;
 using FireXamarin.Views;
 using Rg.Plugins.Popup.Extensions;
@@ -94,9 +95,8 @@ namespace FireXamarin.ViewModels
             }
 
             var contacts = (await _contactFirebaseService.GetAllContacts()).ToList();
-            //AllContacts = contacts.Where(c => !c.Removed).ToList();
-            AllContacts = contacts;
-
+            AllContacts = contacts.Where(c => !c.Removed).ToList();
+            
             if (AllContacts.Any())
                 SearchExecute("");
             else
@@ -191,16 +191,16 @@ namespace FireXamarin.ViewModels
             {
                 var items = new List<BottomSheetItem>
                 {
-                    new BottomSheetItem {Icon = "&#xf304;", Name = action_edit},
-                    new BottomSheetItem {Icon = "&#xf879;", Name = action_call}
+                    new BottomSheetItem {Icon = "f304".ToUnicode(), Name = action_edit},
+                    new BottomSheetItem {Icon = "f879".ToUnicode(), Name = action_call}
                 };
 
                 if (Selected.HasEmail)
-                    items.Add(new BottomSheetItem { Icon = "&#xf0e0;", Name = action_mail });
+                    items.Add(new BottomSheetItem { Icon = "f0e0".ToUnicode(), Name = action_mail });
                 if (Selected.HasLocation)
-                    items.Add(new BottomSheetItem { Icon = "&#xf3c5;", Name = action_route });
+                    items.Add(new BottomSheetItem { Icon = "f3c5".ToUnicode(), Name = action_route });
 
-                items.Add(new BottomSheetItem { Icon = "&#xf2ed;", Name = action_remove });
+                items.Add(new BottomSheetItem { Icon = "f2ed".ToUnicode(), Name = action_remove });
 
                 await ShowOptionsBottomSheet(items, title);
             }

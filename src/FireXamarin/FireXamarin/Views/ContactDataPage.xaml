@@ -99,7 +99,7 @@
                             Margin="0,-4,0,0"
                             HorizontalOptions="FillAndExpand"
                             Placeholder="Busque a localização por GPS"
-                            Text="{Binding CurrentContact.LocationName}" />
+                            Text="{Binding CurrentLocation}" />
                         <StackLayout Orientation="Horizontal">
                             <Label
                                 FontFamily="FontAwesomeBold"

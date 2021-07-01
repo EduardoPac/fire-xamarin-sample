@@ -21,9 +21,21 @@ namespace FireXamarin.ViewModels
             set => SetProperty(ref _contact, value);
         }
 
+        string _currentLocation;
+        public string CurrentLocation
+        {
+            get => _currentLocation;
+            set => SetProperty(ref _currentLocation, value);
+        }
+
         private readonly IContactFireBaseService _contactFirebaseService;
 
-        public bool IsEdit { get; set; }
+        bool _isEdit;
+        public bool IsEdit
+        {
+            get => _isEdit;
+            set => SetProperty(ref _isEdit, value);
+        }
 
         public ICommand SaveCommand { get; set; }
         public ICommand GetLocationCommand { get; set; }
@@ -41,9 +53,13 @@ namespace FireXamarin.ViewModels
         public async Task InitializeAsync()
         {
             if (CurrentContact != null)
+            {
                 IsEdit = true;
+                CurrentLocation = CurrentContact.LocationName;
+            }
             else
                 CurrentContact = new Contact();
+            
         }
 
         private async Task SaveCommandExecute()
@@ -59,6 +75,8 @@ namespace FireXamarin.ViewModels
                 await Application.Current.MainPage.DisplayAlert("Salvar contato", "Sem internet para remover o contato", "OK");
                 return;
             }
+
+            CurrentContact.LocationName = CurrentLocation;
 
             if (IsEdit)
             {
@@ -112,7 +130,8 @@ namespace FireXamarin.ViewModels
                     var placemarks = await Geocoding.GetPlacemarksAsync(location.Latitude, location.Longitude);
                     var placemark = placemarks?.FirstOrDefault();
 
-                    CurrentContact.LocationName = string.Format("{0},{1} - {2}", placemark.Thoroughfare, placemark.FeatureName, placemark.SubAdminArea); ;
+                    CurrentLocation = string.Format("{0},{1},{2}-{3}", placemark.Thoroughfare, placemark.FeatureName, placemark.SubAdminArea, placemark.AdminArea);
+                    CurrentContact.LocationName = string.Format("{0}, {1}, {2}-{3}", placemark.Thoroughfare, placemark.FeatureName, placemark.SubAdminArea, placemark.AdminArea);
                     CurrentContact.LocationLatitude = location.Latitude;
                     CurrentContact.LocationLongitude = location.Longitude;
                 }

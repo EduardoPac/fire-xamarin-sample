@@ -4,7 +4,7 @@ using FireXamarin.UnitTests.Helpers;
 using FluentAssertions;
 using Xunit;
 
-namespace FireXamarin.UnitTests.Tests.Services
+namespace Services
 {
     public class ContactFirebaseServiceTest : BaseTests
     {
@@ -17,7 +17,7 @@ namespace FireXamarin.UnitTests.Tests.Services
 
         #region Valid
 
-        [Fact]
+        [Fact(DisplayName = "[Valid] Get All Contacts")]
         public async void GetAllContacts()
         {
             var result = await _service.GetAllContacts();
@@ -25,7 +25,7 @@ namespace FireXamarin.UnitTests.Tests.Services
             result.Should().NotBeNull();
         }
 
-        [Fact]
+        [Fact(DisplayName = "[Valid] Get By Id")]
         public async void GetByIdValid()
         {
             var result = await _service.GetById(_contactInTest.Id);
@@ -33,7 +33,7 @@ namespace FireXamarin.UnitTests.Tests.Services
             result.Should().BeEquivalentTo(_contactInTest);
         }
 
-        [Fact]
+        [Fact(DisplayName = "[Valid] Save Contact")]
         public async void SaveContactValid()
         {
             var result = await _service.SaveContact(_contactInTest);
@@ -41,7 +41,7 @@ namespace FireXamarin.UnitTests.Tests.Services
             result.Should().BeTrue();
         }
 
-        [Fact]
+        [Fact(DisplayName = "[Valid] Remove Contact")]
         public async void RemoveContactValid()
         {
             var contact = EntitiesFactory.GetNewContact();
@@ -58,7 +58,7 @@ namespace FireXamarin.UnitTests.Tests.Services
 
         #region Invalid
 
-        [Theory]
+        [Theory(DisplayName = "[Invalid] Get By Id")]
         [InlineData("")]
         [InlineData(null)]
         public async void GetByIdInvalid(string id)
@@ -68,7 +68,7 @@ namespace FireXamarin.UnitTests.Tests.Services
             result.Should().BeNull();
         }
 
-        [Theory]
+        [Theory(DisplayName = "[Invalid] Save Contact")]
         [InlineData(null, "test", "test", "test")]
         [InlineData("test", null, "test", "test")]
         [InlineData("test", "test", null, "test")]
@@ -81,7 +81,7 @@ namespace FireXamarin.UnitTests.Tests.Services
             result.Should().BeFalse();
         }
 
-        [Theory]
+        [Theory(DisplayName = "[Invalid] Remove Contact")]
         [InlineData(null)]
         [InlineData("")]
         public async void RemoveContactInvalid(string id)

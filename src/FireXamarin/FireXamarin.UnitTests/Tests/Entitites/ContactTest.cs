@@ -2,11 +2,11 @@ using FireXamarin.UnitTests.Helpers;
 using FluentAssertions;
 using Xunit;
 
-namespace FireXamarin.UnitTests.Tests.Entitites
+namespace Entitites
 {
     public class ContactTest : BaseTests
     {
-        [Fact]
+        [Fact (DisplayName = "[Valid] Properties Required")]
         public void PropertiesRequiredValid()
         {
             var user = EntitiesFactory.GetNewContact();
@@ -16,7 +16,7 @@ namespace FireXamarin.UnitTests.Tests.Entitites
             result.Should().BeTrue();
         }
 
-        [Theory]
+        [Theory (DisplayName = "[Invalid] Properties Required")]
         [InlineData(null,"test","test","test")]
         [InlineData("test",null,"test","test")]
         [InlineData("test","test",null,"test")]
