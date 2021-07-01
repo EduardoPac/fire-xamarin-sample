@@ -68,7 +68,10 @@ namespace FireXamarin.ViewModels
 
         public async Task InitializeAsync()
         {
-            await LoadContacts();
+            if (isFirstAccess)
+                await LoadContacts();
+            else
+                await RefreshCommandExecute();
         }
 
         #region LoadList
