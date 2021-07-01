@@ -212,6 +212,8 @@
                         <TapGestureRecognizer Command="{Binding AddContactCommand}" />
                     </StackLayout.GestureRecognizers>
                     <Label
+                        x:Name="BtnAdd"
+                        FontSize="Large"
                         HorizontalOptions="CenterAndExpand"
                         Text="Adicionar"
                         TextColor="Black"

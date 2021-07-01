@@ -21,7 +21,8 @@ namespace FireXamarin.ViewModels
         public ObservableRangeCollection<Contact> Contacts { get; set; }
         private readonly IContactFireBaseService _contactFirebaseService;
 
-        private bool isFirstAccess = true;
+        private bool isFirstAccess { get; set; } = true;
+        private bool IsRefreshing { get; set; }
 
         Contact _selected;
         public Contact Selected
@@ -29,6 +30,7 @@ namespace FireXamarin.ViewModels
             get => _selected;
             set => SetProperty(ref _selected, value);
         }
+
 
         private string _searchText;
         public string SearchText
@@ -72,8 +74,11 @@ namespace FireXamarin.ViewModels
         #region LoadList
         private async Task RefreshCommandExecute()
         {
-            if (!isFirstAccess && !IsBusy)
+            if (!isFirstAccess && !IsRefreshing)
+            {
+                IsRefreshing = true;
                 await LoadContacts();
+            }
         }
 
         private async Task LoadContacts()
@@ -84,13 +89,13 @@ namespace FireXamarin.ViewModels
             {
                 EmptyMessage = "Sem Internet :(";
                 isFirstAccess = false;
+                IsRefreshing = false;
             }
           
 
             if (AllContacts.Any())
             {
                 await Task.Delay(10);
-
                 AllContacts.Clear();
             }
 
@@ -109,11 +114,15 @@ namespace FireXamarin.ViewModels
 
                 isFirstAccess = false;
                 IsBusy = false;
+                IsRefreshing = false;
             }
         }
 
         private List<Contact> SortContacts(List<Contact> contacts)
         {
+            if (contacts == null || !contacts.Any())
+                return null;
+
             contacts.ForEach(c => { c.IsFirst = false; c.IsLast = false; });
             contacts.OrderBy(c => c.Name);
             contacts.First().IsFirst = true;
@@ -135,12 +144,12 @@ namespace FireXamarin.ViewModels
                        (i.Name != null && (!string.IsNullOrWhiteSpace(i.Name) && i.Name.IgnoreCaseSensitiveAndAccents().Contains(search)))
                     || (i.Phone != null && (!string.IsNullOrWhiteSpace(i.Phone) && i.Phone.IgnoreCaseSensitiveAndAccents().Contains(search)))
                     || (i.Email != null && (!string.IsNullOrWhiteSpace(i.Email) && i.Email.IgnoreCaseSensitiveAndAccents().Contains(search)))
-                    || (i.LocationName != null && (!string.IsNullOrWhiteSpace(i.LocationName) && i.Name.IgnoreCaseSensitiveAndAccents().Contains(search)))
+                    || (i.LocationName != null && (!string.IsNullOrWhiteSpace(i.LocationName) && i.LocationName.IgnoreCaseSensitiveAndAccents().Contains(search)))
                 ).ToList();
 
                 var data = SortContacts(searchResult);
 
-                if (data == null | !data.Any())
+                if (data == null || !data.Any())
                 {
                     await Task.Delay(50);
                     Contacts.Clear();
@@ -153,11 +162,12 @@ namespace FireXamarin.ViewModels
                     EmptyMessage = "Carregando...";
                     Contacts.Clear();
 
-                    await Task.Delay(50);
+                    await Task.Delay(100);
                     Contacts.AddRange(data);
                 }
 
                 IsBusy = false;
+                IsRefreshing = false;
                 isFirstAccess = false;
             }
             catch (Exception ex)
@@ -165,6 +175,7 @@ namespace FireXamarin.ViewModels
                 Console.WriteLine(ex.Message);
                 isFirstAccess = false;
                 IsBusy = false;
+                IsRefreshing = false;
             }
         }
         #endregion

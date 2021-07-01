@@ -11,7 +11,7 @@ namespace Services
         #region Setup
 
         private readonly ContactFirebaseService _service = new();
-        private readonly Contact _contactInTest = new() { Id = "test", Name = "test", Email = "test", Phone = "test"};
+        private readonly Contact _contactInTest = new() { Id = "test", Name = "test", Email = "test", Phone = "test", Removed = true};
 
         #endregion
 

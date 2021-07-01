@@ -23,7 +23,7 @@
 	<key>MinimumOSVersion</key>
 	<string>10</string>
 	<key>CFBundleDisplayName</key>
-	<string>FireXamarin</string>
+	<string>Fire Xamarin</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.companyname.FireXamarin</string>
 	<key>CFBundleVersion</key>

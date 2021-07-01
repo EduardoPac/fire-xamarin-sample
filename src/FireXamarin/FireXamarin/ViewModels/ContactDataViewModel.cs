@@ -130,7 +130,7 @@ namespace FireXamarin.ViewModels
                     var placemarks = await Geocoding.GetPlacemarksAsync(location.Latitude, location.Longitude);
                     var placemark = placemarks?.FirstOrDefault();
 
-                    CurrentLocation = string.Format("{0},{1},{2}-{3}", placemark.Thoroughfare, placemark.FeatureName, placemark.SubAdminArea, placemark.AdminArea);
+                    CurrentLocation = string.Format("{0}, {1}, {2}-{3}", placemark.Thoroughfare, placemark.FeatureName, placemark.SubAdminArea, placemark.AdminArea);
                     CurrentContact.LocationName = string.Format("{0}, {1}, {2}-{3}", placemark.Thoroughfare, placemark.FeatureName, placemark.SubAdminArea, placemark.AdminArea);
                     CurrentContact.LocationLatitude = location.Latitude;
                     CurrentContact.LocationLongitude = location.Longitude;

@@ -12,6 +12,7 @@ namespace FireXamarin.Views
         {
             InitializeComponent();
             BindingContext = new ContactListViewModel();
+           
         }
         
         protected override async void OnAppearing()
